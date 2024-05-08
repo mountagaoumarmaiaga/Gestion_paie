@@ -1,34 +1,19 @@
 import React, { useState } from "react";
+import { loginUser }from "../../../redux/authSlice";
+import { useDispatch, useSelector } from "react-redux";// Importez le thunk
 import { TEInput, TERipple } from "tw-elements-react";
 import Emomar124 from "./Emomar124.png";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(""); // Ajout de l'état pour gérer les erreurs
+  const dispatch = useDispatch(); // Pour envoyer des actions
+  const authState = useSelector((state) => state.auth); // Sélecteur pour accéder à l'état d'authentification
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    try {
-      const formData = new FormData();
-      formData.append("username", username);
-      formData.append("password", password);
-
-      const response = await fetch("http://127.0.0.1:8000/api/login/", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Authentication failed");
-      }
-
-      // Redirection vers une page après une connexion réussie (à remplacer par la destination souhaitée)
-      window.location.href = "/dashboard";
-    } catch (error) {
-      console.error("Authentication failed", error);
-      setError("Nom d'utilisateur ou mot de passe incorrect"); // Définition de l'erreur
-    }
+    const credentials = { username, password };
+    dispatch(loginUser(credentials)); // Envoyer le thunk
   };
 
   const handleChange = (event) => {
@@ -80,14 +65,16 @@ function Login() {
                 <TERipple rippleColor="light">
                   <button
                     type="submit"
-                    className="inline-block rounded bg-primary px-7 pb-2.5 pt-3 text-sm font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"
+                    className="inline-block rounded bg-primary px-7 pb-2.5 pt-3 text-sm font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)]"
                   >
                     Connexion
                   </button>
                 </TERipple>
               </div>
               {/* Affichage de l'erreur */}
-              {error && <p className="text-red-500">{error}</p>}
+              {authState.error && (
+                <p className="text-red-500">{authState.error}</p>
+              )}
             </form>
           </div>
         </div>

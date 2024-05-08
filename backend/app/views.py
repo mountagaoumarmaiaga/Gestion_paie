@@ -10,7 +10,7 @@ from rest_framework import status
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Utilisateur
 from rest_framework.authtoken.models import Token
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import render
@@ -19,8 +19,7 @@ class EmployerViewset(viewsets.ModelViewSet):
     queryset = Employer.objects.all()
     serializer_class = EmployerSerializer
     # permission_classes = [IsAuthenticatedOrReadOnly]
-    
-    
+ 
 class ContratViewset(viewsets.ModelViewSet):
     queryset = Contrat.objects.all()
     serializer_class = ContratSerializer
@@ -56,32 +55,36 @@ def register_user(request):
         return Response({'message': 'This endpoint only accepts POST requests for user registration.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 ## # Authentification ################################
-@api_view(['GET', 'POST'])
+@api_view(['POST'])
 def user_login(request):
-    if request.method == 'POST':
-        username = request.data.get('username')
-        password = request.data.get('password')
+    username = request.data.get('username')
+    password = request.data.get('password')
+    if not username or not password:
+        # If either username or password is missing
+        return Response(
+            {'error': 'Username and password are required.'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
-        user = None
-        if '@' in username:
-            try:
-                user = Utilisateur.objects.get(email=username)
-            except ObjectDoesNotExist:
-                pass
+    # Authenticate using the provided username and password
+    user = authenticate(request, username=username, password=password)
 
-        if not user:
-            user = authenticate(username=username, password=password)
+    if user:
+        login(request, user)
+        # If authentication is successful, generate or retrieve a token
+        token, created = Token.objects.get_or_create(user=user)
+        serializer = UserSerializer(user, many=False)
+        
+        return Response(
+            {'token': token.key, 'user': serializer.data}, 
+            status=status.HTTP_200_OK
+        )
 
-        if user:
-            token, _ = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key}, status=status.HTTP_200_OK)
-
-        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-    elif request.method == 'GET':
-        # Vous pouvez renvoyer une réponse informative pour les requêtes GET ici
-        return Response({'message': 'This endpoint only accepts POST requests for login.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    
+    # If authentication fails
+    return Response(
+        {'error': 'Invalid credentials'}, 
+        status=status.HTTP_401_UNAUTHORIZED
+    )
     
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

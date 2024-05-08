@@ -15,8 +15,8 @@ const routes = [
     icon: <FaHome />,
   },
   {
-    path: "/users",
-    name: "Users",
+    path: "/empoyer",
+    name: "Employer",
     icon: <FaUser />,
   },
   {
@@ -31,21 +31,21 @@ const routes = [
   },
   {
     path: "/file-manager",
-    name: "File Manager",
+    name: "Employer",
     icon: <AiTwotoneFileExclamation />,
     subRoutes: [
       {
-        path: "/settings/profile",
-        name: "Profile ",
+        path: "/employer/Employer",
+        name: "Ajouter un Employer",
         icon: <FaUser />,
       },
       {
-        path: "/settings/2fa",
-        name: "2FA",
+        path: "/employer/Liste|Employer",
+        name: "Liste|Employer",
         icon: <FaLock />,
       },
       {
-        path: "/settings/billing",
+        path: "/employer/billing",
         name: "Billing",
         icon: <FaMoneyBill />,
       },
@@ -57,23 +57,23 @@ const routes = [
     icon: <BsCartCheck />,
   },
   {
-    path: "/settings",
-    name: "Settings",
+    path: "/employer",
+    name: "employer",
     icon: <BiCog />,
     exact: true,
     subRoutes: [
       {
-        path: "/settings/profile",
+        path: "/employer/profile",
         name: "Profile ",
         icon: <FaUser />,
       },
       {
-        path: "/settings/2fa",
+        path: "/employer/2fa",
         name: "2FA",
         icon: <FaLock />,
       },
       {
-        path: "/settings/billing",
+        path: "/employer/billing",
         name: "Billing",
         icon: <FaMoneyBill />,
       },

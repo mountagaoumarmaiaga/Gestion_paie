@@ -2,12 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
-import store from './app/Store/reducers/Store.js';
-import { Provider } from 'react-redux';
+import { Provider } from 'react-redux'; // N'oubliez pas d'importer Provider
+import store from './redux/store'; // Assurez-vous que le store est correctement défini
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+// Utilisation de createRoot pour le rendu avec Redux Provider
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
   <React.StrictMode>
-    <Provider store={store}>
+    <Provider store={store}> {/* Ajoutez le Provider autour de l'application */}
       <App />
     </Provider>
   </React.StrictMode>
